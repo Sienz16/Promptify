@@ -10,34 +10,14 @@
 	let { option, selected = false, onclick }: Props = $props();
 </script>
 
-<button type="button" class:selected class="accent-pill" aria-pressed={selected} {onclick}>
+<button
+	type="button"
+	class="cursor-pointer rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-sm font-medium text-zinc-600 transition-all hover:border-black hover:text-black active:scale-[0.98]"
+	class:bg-black={selected}
+	class:text-white={selected}
+	class:border-black={selected}
+	aria-pressed={selected}
+	{onclick}
+>
 	<span>{option.name}</span>
 </button>
-
-<style>
-	.accent-pill {
-		padding: 0.7rem 1rem;
-		border: 1px solid rgb(191 219 254);
-		border-radius: 999px;
-		background: rgb(248 250 252);
-		font-size: 0.92rem;
-		font-weight: 600;
-		color: rgb(30 41 59);
-		transition:
-			border-color 180ms ease,
-			background 180ms ease,
-			color 180ms ease,
-			transform 180ms ease;
-	}
-
-	.accent-pill:hover {
-		transform: translateY(-1px);
-		border-color: rgb(56 189 248 / 0.55);
-	}
-
-	.accent-pill.selected {
-		border-color: rgb(14 116 144);
-		background: rgb(236 254 255);
-		color: rgb(8 47 73);
-	}
-</style>

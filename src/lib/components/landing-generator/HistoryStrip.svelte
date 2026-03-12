@@ -15,71 +15,25 @@
 	let { items, onSelect }: Props = $props();
 </script>
 
-<section class="history">
-	<div class="heading-row">
-		<h2>Recent generations</h2>
-		<span>Last {items.length}</span>
+<section class="flex flex-col gap-4">
+	<div class="flex items-baseline justify-between">
+		<h2 class="text-sm font-semibold tracking-tight text-zinc-900">Recent generations</h2>
+		<span class="text-xs text-zinc-400">Last {items.length}</span>
 	</div>
 
-	<div class="history-list">
+	<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 		{#each items as item, index (`${item.style}-${item.accent ?? 'none'}-${index}`)}
-			<button type="button" class="history-card" onclick={() => onSelect?.(item)}>
-				<strong>{item.style}</strong>
-				<p>{item.accent ?? 'No accent overlay'}</p>
-				<span>Open saved result</span>
+			<button
+				type="button"
+				class="flex flex-col items-start gap-1 rounded-lg border border-zinc-200 bg-white p-4 text-left transition-all hover:border-black active:scale-[0.98]"
+				onclick={() => onSelect?.(item)}
+			>
+				<strong class="text-sm font-semibold text-zinc-900">{item.style}</strong>
+				<p class="text-xs text-zinc-500">{item.accent ?? 'No accent overlay'}</p>
+				<span class="mt-2 text-[10px] font-bold tracking-wider uppercase text-zinc-400">
+					Open result
+				</span>
 			</button>
 		{/each}
 	</div>
 </section>
-
-<style>
-	.history {
-		display: grid;
-		gap: 1rem;
-	}
-
-	.heading-row {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
-		align-items: baseline;
-	}
-
-	h2,
-	p {
-		margin: 0;
-	}
-
-	.heading-row span,
-	.history-card p,
-	.history-card span {
-		color: rgb(71 85 105);
-	}
-
-	.history-list {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-		gap: 0.85rem;
-	}
-
-	.history-card {
-		display: grid;
-		gap: 0.35rem;
-		padding: 0.95rem;
-		border: 1px solid rgb(226 232 240);
-		border-radius: 1rem;
-		background: rgb(255 255 255 / 0.9);
-		text-align: left;
-		color: rgb(15 23 42);
-		transition:
-			transform 180ms ease,
-			border-color 180ms ease,
-			box-shadow 180ms ease;
-	}
-
-	.history-card:hover {
-		transform: translateY(-1px);
-		border-color: rgb(14 116 144 / 0.45);
-		box-shadow: 0 12px 28px rgb(15 23 42 / 0.08);
-	}
-</style>
