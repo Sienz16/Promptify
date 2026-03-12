@@ -25,6 +25,14 @@ bun x sv@0.12.5 create --template minimal --types ts --add prettier vitest="usag
 3. Adjust `SECRET_API_URL` and `AI_MODEL` in `.env` if you want a different endpoint or routed model.
 4. Start the app with `bun run dev`.
 
+## Dokploy deployment
+
+1. Add `SECRET_API_KEY`, `SECRET_API_URL`, and `AI_MODEL` in Dokploy's Environment tab.
+2. Deploy the repo in Dokploy using `docker-compose.yml`.
+3. Expose container port `3000` in Dokploy.
+
+The app now builds with SvelteKit's Node adapter and runs behind Dokploy's reverse proxy using forwarded headers.
+
 Verification:
 
 - `bun run check`

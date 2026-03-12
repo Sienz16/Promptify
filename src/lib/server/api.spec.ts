@@ -8,16 +8,8 @@ const { envState } = vi.hoisted(() => ({
 	}
 }));
 
-vi.mock('$env/static/private', () => ({
-	get SECRET_API_KEY() {
-		return envState.SECRET_API_KEY;
-	},
-	get SECRET_API_URL() {
-		return envState.SECRET_API_URL;
-	},
-	get AI_MODEL() {
-		return envState.AI_MODEL;
-	}
+vi.mock('./env', () => ({
+	getPrivateEnv: () => envState
 }));
 
 import { buildApiRequestBody, requestLandingPrompt } from './api';

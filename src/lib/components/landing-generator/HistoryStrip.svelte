@@ -15,24 +15,26 @@
 	let { items, onSelect }: Props = $props();
 </script>
 
-<section class="flex flex-col gap-4">
-	<div class="flex items-baseline justify-between">
-		<h2 class="text-sm font-semibold tracking-tight text-zinc-900">Recent generations</h2>
-		<span class="text-xs text-zinc-400">Last {items.length}</span>
+<section class="flex flex-col gap-6">
+	<div class="flex items-baseline justify-between border-b border-zinc-100 pb-4">
+		<h2 class="text-[10px] font-bold tracking-[0.24em] uppercase text-zinc-400">Recent generations</h2>
+		<span class="text-[10px] font-bold tracking-widest text-zinc-300 uppercase">Archive / {items.length}</span>
 	</div>
 
-	<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		{#each items as item, index (`${item.style}-${item.accent ?? 'none'}-${index}`)}
 			<button
 				type="button"
-				class="flex flex-col items-start gap-1 rounded-lg border border-zinc-200 bg-white p-4 text-left transition-all hover:border-black active:scale-[0.98]"
+				class="group flex flex-col items-start gap-1 rounded-md border border-zinc-200 bg-white p-5 text-left transition-all hover:border-black active:scale-[0.99] hover:bg-zinc-50/50"
 				onclick={() => onSelect?.(item)}
 			>
-				<strong class="text-sm font-semibold text-zinc-900">{item.style}</strong>
+				<div class="flex w-full items-center justify-between">
+					<strong class="text-sm font-bold tracking-tight text-black">{item.style}</strong>
+					<span class="text-[10px] font-bold tracking-widest text-zinc-300 group-hover:text-black transition-colors uppercase">
+						Restore →
+					</span>
+				</div>
 				<p class="text-xs text-zinc-500">{item.accent ?? 'No accent overlay'}</p>
-				<span class="mt-2 text-[10px] font-bold tracking-wider uppercase text-zinc-400">
-					Open result
-				</span>
 			</button>
 		{/each}
 	</div>

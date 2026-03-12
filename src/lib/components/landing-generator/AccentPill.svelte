@@ -12,7 +12,7 @@
 
 <button
 	type="button"
-	class="cursor-pointer rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-sm font-medium text-zinc-600 transition-all hover:border-black hover:text-black active:scale-[0.98]"
+	class="cursor-pointer rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold tracking-tight text-zinc-500 transition-all hover:border-black hover:text-black active:scale-[0.98]"
 	class:bg-black={selected}
 	class:text-white={selected}
 	class:border-black={selected}

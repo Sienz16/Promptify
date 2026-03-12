@@ -1,5 +1,5 @@
-import { AI_MODEL, SECRET_API_KEY, SECRET_API_URL } from '$env/static/private';
 import { SYSTEM_PROMPT, buildGenerationInput } from '$lib/landing-generator/prompt';
+import { getPrivateEnv } from './env';
 
 const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
 
@@ -8,6 +8,8 @@ function getChatCompletionsUrl(baseUrl: string) {
 }
 
 export function buildApiRequestBody(styleName: string, accentName?: string | null) {
+	const { AI_MODEL } = getPrivateEnv();
+
 	return {
 		model: AI_MODEL,
 		max_tokens: 2000,
@@ -23,23 +25,29 @@ export async function requestLandingPrompt(
 	styleName: string,
 	accentName?: string | null
 ) {
-	if (!SECRET_API_KEY?.trim()) {
+	const {
+		SECRET_API_KEY: secretApiKey,
+		SECRET_API_URL: secretApiUrl,
+		AI_MODEL: aiModel
+	} = getPrivateEnv();
+
+	if (!secretApiKey?.trim()) {
 		throw new Error('SECRET_API_KEY is not configured');
 	}
 
-	if (!SECRET_API_URL?.trim()) {
+	if (!secretApiUrl?.trim()) {
 		throw new Error('SECRET_API_URL is not configured');
 	}
 
-	if (!AI_MODEL?.trim()) {
+	if (!aiModel?.trim()) {
 		throw new Error('AI_MODEL is not configured');
 	}
 
-	const response = await fetchImpl(getChatCompletionsUrl(SECRET_API_URL), {
+	const response = await fetchImpl(getChatCompletionsUrl(secretApiUrl), {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${SECRET_API_KEY}`
+			Authorization: `Bearer ${secretApiKey}`
 		},
 		body: JSON.stringify(buildApiRequestBody(styleName, accentName))
 	});

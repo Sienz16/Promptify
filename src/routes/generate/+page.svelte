@@ -147,20 +147,31 @@
 		}
 	}
 
+	let briefCopied = $state(false);
+	let markdownCopied = $state(false);
+
+	async function copyBrief() {
+		if (result) {
+			await navigator.clipboard.writeText(result.prompt);
+			briefCopied = true;
+			setTimeout(() => (briefCopied = false), 2000);
+		}
+	}
+
+	async function copyMarkdownContent() {
+		if (markdownPrompt) {
+			await navigator.clipboard.writeText(markdownPrompt);
+			markdownCopied = true;
+			setTimeout(() => (markdownCopied = false), 2000);
+		}
+	}
+
 	function startOver() {
 		currentStage = 'style';
 		selectedStyle = null;
 		selectedAccent = null;
 		result = null;
 		errorMessage = '';
-	}
-
-	async function copyPrompt() {
-		if (result) await navigator.clipboard.writeText(result.prompt);
-	}
-
-	async function copyMarkdown() {
-		if (markdownPrompt) await navigator.clipboard.writeText(markdownPrompt);
 	}
 
 	function exportJson() {
@@ -212,25 +223,33 @@
 
 <div class="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12 sm:py-20">
 	<header class="flex items-center justify-between">
-		<div class="flex items-center gap-4">
+		<div class="flex items-center gap-5">
 			<a
 				href="/"
-				class="group flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 transition-all hover:border-black active:scale-90"
+				class="group flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white transition-all hover:border-black active:scale-95"
 			>
-				<span class="text-lg transition-transform group-hover:-translate-x-0.5">←</span>
+				<span class="text-sm transition-transform group-hover:-translate-x-0.5">←</span>
 			</a>
-			<div>
-				<h1 class="text-xl font-bold tracking-tight text-black">Generator Console</h1>
-				<p class="text-xs text-zinc-500">
-					Stage {currentStage === 'style' ? '1' : currentStage === 'accent' ? '2' : '3'} of 3
-				</p>
+			<div class="space-y-0.5">
+				<h1 class="text-lg font-bold tracking-tight text-black uppercase">Generator Console</h1>
+				<div class="flex items-center gap-2">
+					<div class="flex h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
+						<div 
+							class="h-full bg-black transition-all duration-500" 
+							style:width={currentStage === 'style' ? '33%' : currentStage === 'accent' ? '66%' : '100%'}
+						></div>
+					</div>
+					<p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+						Stage {currentStage === 'style' ? '1' : currentStage === 'accent' ? '2' : '3'} of 3
+					</p>
+				</div>
 			</div>
 		</div>
 
 		{#if currentStage !== 'style' && !isGenerating}
 			<button
 				onclick={startOver}
-				class="text-xs font-medium text-zinc-400 transition-colors hover:text-black"
+				class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase transition-colors hover:text-black"
 			>
 				Reset Forge
 			</button>
@@ -241,12 +260,12 @@
 		<!-- STAGE 1: STYLE SELECTION -->
 		{#if currentStage === 'style'}
 			<div
-				class="flex flex-col gap-8 pb-32"
+				class="absolute inset-x-0 top-0 flex flex-col gap-10 pb-32"
 				in:fly={{ x: 20, duration: 400 }}
 				out:fly={{ x: -20, duration: 400 }}
 			>
-				<div class="space-y-2 border-b border-zinc-100 pb-4">
-					<h2 class="text-2xl font-bold tracking-tight text-black uppercase">
+				<div class="space-y-3 border-b border-zinc-100 pb-6">
+					<h2 class="text-3xl font-bold tracking-tight text-black">
 						1. Pick a base style
 					</h2>
 					<p class="text-sm text-zinc-500">
@@ -266,19 +285,19 @@
 
 				<div class="fixed inset-x-0 bottom-8 z-30 flex justify-center px-6">
 					<div
-						class="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white/90 p-2 shadow-2xl backdrop-blur-md sm:gap-3"
+						class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white/90 p-2 shadow-xl backdrop-blur-md"
 					>
 						<button
 							onclick={surpriseMe}
 							disabled={isShuffling}
-							class="flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-black transition-all hover:border-black active:scale-95 disabled:opacity-50"
+							class="flex h-10 items-center justify-center rounded-md border border-zinc-200 bg-white px-5 text-xs font-bold uppercase tracking-widest text-black transition-all hover:border-black active:scale-95 disabled:opacity-50"
 						>
 							<svg
-								class="mr-2 h-4 w-4 {isShuffling ? 'animate-spin' : ''}"
+								class="mr-2 h-3.5 w-3.5 {isShuffling ? 'animate-spin' : ''}"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
-								stroke-width="2"
+								stroke-width="2.5"
 								><path
 									stroke-linecap="round"
 									stroke-linejoin="round"
@@ -291,7 +310,7 @@
 						<button
 							onclick={goToAccent}
 							disabled={!selectedStyle}
-							class="flex h-11 items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-all hover:bg-zinc-800 active:scale-95 disabled:bg-zinc-100 disabled:text-zinc-400"
+							class="flex h-10 items-center justify-center rounded-md bg-black px-8 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-zinc-800 active:scale-95 disabled:bg-zinc-100 disabled:text-zinc-400"
 						>
 							Next Stage →
 						</button>
@@ -303,16 +322,16 @@
 		<!-- STAGE 2: ACCENT SELECTION -->
 		{#if currentStage === 'accent'}
 			<div
-				class="flex flex-col gap-8 pb-32"
+				class="absolute inset-x-0 top-0 flex flex-col gap-10 pb-32"
 				in:fly={{ x: 20, duration: 400 }}
 				out:fly={{ x: -20, duration: 400 }}
 			>
-				<div class="space-y-2 border-b border-zinc-100 pb-4">
-					<h2 class="text-2xl font-bold tracking-tight text-black uppercase">2. Optional accent</h2>
+				<div class="space-y-3 border-b border-zinc-100 pb-6">
+					<h2 class="text-3xl font-bold tracking-tight text-black">2. Optional accent</h2>
 					<p class="text-sm text-zinc-500">Add an interaction layer to sharpen the visual story.</p>
 				</div>
 
-				<div class="flex flex-wrap gap-3 py-4">
+				<div class="flex flex-wrap gap-2.5 py-4">
 					{#each ACCENT_OPTIONS as option (option.id)}
 						<AccentPill
 							{option}
@@ -322,33 +341,33 @@
 					{/each}
 				</div>
 
-				<div class="rounded-xl border border-zinc-200 bg-zinc-50 p-6">
-					<p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-						Current Selection
+				<div class="rounded-md border border-zinc-200 bg-zinc-50/50 p-8">
+					<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
+						Selected Protocol
 					</p>
-					<div class="mt-2 flex items-baseline gap-2">
-						<span class="text-lg font-bold text-black">{selectedStyle?.name}</span>
+					<div class="mt-4 flex items-baseline gap-3">
+						<span class="text-2xl font-bold tracking-tight text-black">{selectedStyle?.name}</span>
 						{#if selectedAccent}
-							<span class="text-zinc-400">+</span>
-							<span class="text-lg font-bold text-black">{selectedAccent.name}</span>
+							<span class="text-xl font-bold text-zinc-300">/</span>
+							<span class="text-2xl font-bold tracking-tight text-black">{selectedAccent.name}</span>
 						{/if}
 					</div>
 				</div>
 
 				<div class="fixed inset-x-0 bottom-8 z-30 flex justify-center px-6">
 					<div
-						class="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white/90 p-2 shadow-2xl backdrop-blur-md sm:gap-3"
+						class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white/90 p-2 shadow-xl backdrop-blur-md"
 					>
 						<button
 							onclick={() => (currentStage = 'style')}
-							class="flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-black transition-all hover:border-black active:scale-95"
+							class="flex h-10 items-center justify-center rounded-md border border-zinc-200 bg-white px-5 text-xs font-bold uppercase tracking-widest text-black transition-all hover:border-black active:scale-95"
 						>
 							← Back
 						</button>
 
 						<button
 							onclick={generatePrompt}
-							class="flex h-11 items-center justify-center rounded-xl bg-black px-8 text-sm font-semibold text-white transition-all hover:bg-zinc-800 active:scale-95"
+							class="flex h-10 items-center justify-center rounded-md bg-black px-10 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-zinc-800 active:scale-95"
 						>
 							{selectedAccent ? 'Generate with Accent' : 'Generate Plain Style'}
 						</button>
@@ -376,85 +395,89 @@
 
 		<!-- STAGE 4: RESULT -->
 		{#if currentStage === 'result' && result}
-			<div class="flex flex-col gap-12 pb-20" in:fly={{ y: 20, duration: 600 }}>
-				<section id="result-output" class="flex w-full scroll-mt-24 flex-col gap-6">
+			<div class="flex flex-col gap-8 pb-20" in:fly={{ y: 20, duration: 600 }}>
+				<section id="result-output" class="flex w-full scroll-mt-24 flex-col gap-8">
+					<!-- Main Result Card -->
 					<section
-						class="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm sm:p-8"
+						class="overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 shadow-sm sm:p-10"
 					>
-						<div class="flex flex-col gap-8">
+						<div class="flex flex-col gap-10">
 							<div
-								class="flex flex-col gap-6 border-b border-zinc-100 pb-6 lg:flex-row lg:items-start lg:justify-between"
+								class="flex flex-col gap-8 border-b border-zinc-100 pb-8 lg:flex-row lg:items-start lg:justify-between"
 							>
-								<div class="space-y-3">
+								<div class="space-y-4">
 									<div class="flex items-center gap-2">
-										<span class="h-2 w-2 rounded-full bg-green-500"></span>
+										<span class="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
 										<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
 											Synthesis Complete
 										</p>
 									</div>
 									<div class="space-y-2">
-										<h2 class="text-3xl font-bold tracking-tight text-black sm:text-4xl">
+										<h2 class="text-4xl font-bold tracking-tight text-black">
 											Result Overview
 										</h2>
-										<p class="max-w-2xl text-sm leading-6 text-zinc-500">
-											A clearer handoff for the selected direction, with the brief, palette, and
-											export-ready developer notes separated into their own working areas.
+										<p class="max-w-2xl text-sm leading-7 text-zinc-500">
+											Your design brief is ready. Below is the refined handoff document including
+											the logical direction, color palette, and implementation details.
 										</p>
 									</div>
 								</div>
 
 								<div class="flex flex-wrap gap-2 lg:max-w-xs lg:justify-end">
 									<button
-										onclick={copyPrompt}
-										class="flex h-10 items-center rounded-full border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-700 transition-colors hover:border-black hover:text-black active:bg-zinc-50"
-										>Copy Brief</button
+										onclick={copyBrief}
+										class="flex h-10 min-w-[100px] items-center justify-center rounded-md border border-zinc-200 bg-white px-5 text-xs font-semibold transition-all hover:border-black hover:text-black active:bg-zinc-50"
+										class:text-zinc-700={!briefCopied}
+										class:text-green-600={briefCopied}
+										>{briefCopied ? 'Copied!' : 'Copy Brief'}</button
 									>
 									<button
 										onclick={exportJson}
-										class="flex h-10 items-center rounded-full border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-700 transition-colors hover:border-black hover:text-black active:bg-zinc-50"
+										class="flex h-10 items-center rounded-md border border-zinc-200 bg-white px-5 text-xs font-semibold text-zinc-700 transition-all hover:border-black hover:text-black active:bg-zinc-50"
 										>Export JSON</button
 									>
 								</div>
 							</div>
 
-							<div class="grid gap-3 sm:grid-cols-3">
-								<div class="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4">
+							<!-- Metrics Grid -->
+							<div class="grid gap-4 sm:grid-cols-3">
+								<div class="rounded-lg border border-zinc-200 bg-zinc-50/50 px-5 py-5">
 									<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
 										Direction
 									</p>
-									<p class="mt-2 text-base font-semibold tracking-tight text-black">
+									<p class="mt-2 text-base font-bold tracking-tight text-black">
 										{selectionLabel}
 									</p>
 								</div>
-								<div class="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4">
+								<div class="rounded-lg border border-zinc-200 bg-zinc-50/50 px-5 py-5">
 									<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
 										Palette
 									</p>
-									<p class="mt-2 text-base font-semibold tracking-tight text-black">
+									<p class="mt-2 text-base font-bold tracking-tight text-black">
 										{result.palette.palette_name}
 									</p>
 								</div>
-								<div class="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4">
+								<div class="rounded-lg border border-zinc-200 bg-zinc-50/50 px-5 py-5">
 									<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
 										Color Roles
 									</p>
-									<p class="mt-2 text-base font-semibold tracking-tight text-black">
+									<p class="mt-2 text-base font-bold tracking-tight text-black">
 										{paletteCount} swatches
 									</p>
 								</div>
 							</div>
 
-							<section class="space-y-4">
+							<!-- Content Section -->
+							<section class="space-y-6">
 								<div class="space-y-1">
-									<h3 class="text-xl font-semibold tracking-tight text-black">Generated Brief</h3>
+									<h3 class="text-xl font-bold tracking-tight text-black">Generated Brief</h3>
 									<p class="text-sm text-zinc-500">
-										The generated language, broken into readable paragraphs instead of one
-										continuous block.
+										The core narrative and design logic, split into semantic paragraphs.
 									</p>
 								</div>
-								<div class="rounded-2xl border border-zinc-200 bg-zinc-50/80 p-5 sm:p-6">
+								<div class="rounded-lg border border-zinc-100 bg-zinc-50/30 p-6 sm:p-8">
 									<div
-										class="prose max-w-none text-sm leading-7 break-words text-zinc-700 prose-zinc"
+										class="prose max-w-none text-base leading-8 break-words text-zinc-700 prose-zinc"
 									>
 										{#each promptParagraphs as paragraph, index (`${index}`)}
 											<p>{paragraph}</p>
@@ -465,51 +488,56 @@
 						</div>
 					</section>
 
+					<!-- Palette Section -->
 					<section
-						class="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm sm:p-8"
+						class="overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 shadow-sm sm:p-10"
 					>
-						<div class="flex flex-col gap-6">
-							<div class="space-y-1 border-b border-zinc-100 pb-5">
+						<div class="flex flex-col gap-8">
+							<div class="space-y-2 border-b border-zinc-100 pb-6">
 								<p class="text-[10px] font-bold tracking-[0.24em] text-zinc-400 uppercase">
-									Palette System
+									System Variables
 								</p>
+								<h3 class="text-2xl font-bold tracking-tight text-black">Palette Reference</h3>
 								<p class="text-sm text-zinc-500">
-									The generated swatches stay intact, with the palette component presented as a
-									full-width reference row.
+									These tokens define the primary visual language. Use these variables in your CSS
+									or theme configuration.
 								</p>
 							</div>
 							<PaletteSwatches palette={result.palette} />
 						</div>
 					</section>
 
+					<!-- Handoff Section -->
 					<section
-						class="overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-50/80 p-6 shadow-sm sm:p-8"
+						class="overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50/50 p-6 shadow-sm sm:p-10"
 					>
-						<div class="flex flex-col gap-4">
-							<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-								<div class="space-y-1">
-									<h3 class="text-xl font-semibold tracking-tight text-black">Developer Handoff</h3>
+						<div class="flex flex-col gap-6">
+							<div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+								<div class="space-y-2">
+									<h3 class="text-2xl font-bold tracking-tight text-black">Developer Handoff</h3>
 									<p class="text-sm text-zinc-500">
-										A quieter export surface for the markdown payload and implementation copy.
+										Markdown documentation for your design system and brief details.
 									</p>
 								</div>
-								<div class="flex flex-wrap gap-2 sm:justify-end">
+								<div class="flex flex-wrap gap-2 lg:justify-end">
 									<button
-										onclick={copyMarkdown}
-										class="flex h-10 items-center rounded-full border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-700 transition-colors hover:border-black hover:text-black active:bg-zinc-50"
-										>Copy Markdown</button
+										onclick={copyMarkdownContent}
+										class="flex h-10 min-w-[120px] items-center justify-center rounded-md border border-zinc-200 bg-white px-5 text-xs font-semibold transition-all hover:border-black hover:text-black active:bg-zinc-50"
+										class:text-zinc-700={!markdownCopied}
+										class:text-green-600={markdownCopied}
+										>{markdownCopied ? 'Copied!' : 'Copy Markdown'}</button
 									>
 									<button
 										onclick={exportMarkdown}
-										class="flex h-10 items-center rounded-full bg-black px-4 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 active:bg-black"
+										class="flex h-10 items-center rounded-md bg-black px-5 text-xs font-semibold text-white transition-all hover:bg-zinc-800 active:bg-black"
 										>Download .md</button
 									>
 								</div>
 							</div>
-							<pre
-								class="max-w-full overflow-x-auto rounded-2xl border border-zinc-200 bg-white p-4 font-mono text-[11px] leading-6 break-words whitespace-pre-wrap text-zinc-500 sm:p-5"><code
-									>{markdownPrompt}</code
-								></pre>
+							<div class="relative group">
+								<pre
+									class="max-w-full overflow-x-auto rounded-md border border-zinc-200 bg-white p-5 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap text-zinc-600 sm:p-8"><code>{markdownPrompt}</code></pre>
+							</div>
 						</div>
 					</section>
 				</section>
@@ -517,7 +545,7 @@
 				<div class="flex justify-center pb-12">
 					<button
 						onclick={startOver}
-						class="flex h-12 items-center justify-center rounded-full bg-black px-12 text-sm font-semibold text-white shadow-xl transition-all hover:bg-zinc-800 active:scale-95"
+						class="flex h-12 items-center justify-center rounded-md bg-black px-12 text-sm font-semibold text-white shadow-lg transition-all hover:bg-zinc-800 active:scale-95"
 					>
 						Start New Forge
 					</button>
